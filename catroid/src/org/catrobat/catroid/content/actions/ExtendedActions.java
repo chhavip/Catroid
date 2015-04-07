@@ -512,7 +512,7 @@ public class ExtendedActions extends Actions {
 
 		action.setPosition(x, y);
 		action.setText(text);
-		//action.setDuration(5);
+		action.setDuration(0);
 		action.setSprite(sprite);
 		return action;
 	}
