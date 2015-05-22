@@ -101,7 +101,7 @@ public class PreStageActivity extends BaseActivity {
 			connectBTDevice(BluetoothDevice.LEGO_NXT);
 		}
 
-		if ((requiredResources & Brick.ARDRONE_SUPPORT ) > 0 && BuildConfig.FEATURE_PARROT_AR_DRONE_ENABLED) {
+		if (((requiredResources & Brick.ARDRONE_SUPPORT ) > 0) && BuildConfig.FEATURE_PARROT_AR_DRONE_ENABLED) {
 
 //			WifiManager mainWifiObj;
 //			mainWifiObj = (WifiManager) getSystemService(getBaseContext().WIFI_SERVICE);
