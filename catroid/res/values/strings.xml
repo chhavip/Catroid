@@ -625,10 +625,7 @@
     <string name="brick_drone_set_config">Set config</string>
     <string name="brick_drone_toggle_video">Toggle video</string>
     <string name="brick_drone_switch_camera">Switch camera</string>
-
-    <!-- <string name="brick_drone_land">Drone: land</string> -->
     <!--  -->
-
 
     <!-- Formula Editor Strings -->
     <string name="formula_editor_data" >Data</string >
