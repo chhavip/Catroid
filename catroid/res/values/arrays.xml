@@ -53,13 +53,4 @@
  		<item >@string/add_line_break</item >
  		<item >@string/close</item >
  	</string-array >
-
-    <!-- Drone Config Spinner -->
-    <string-array name="drone_config_spinner" >
- 		<item >@string/drone_config_default</item >
-        <item >@string/drone_config_indoor</item >
- 		<item >@string/drone_config_outdoor</item >
- 	</string-array >
-
-
 </resources>
