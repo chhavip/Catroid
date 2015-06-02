@@ -53,131 +53,16 @@ import org.catrobat.catroid.ui.fragment.FormulaEditorFragment;
 
 import java.util.List;
 
-public class PhiroSetVariableBrick extends UserVariableBrick {
-
-	private static final long serialVersionUID = 1L;
-	private transient AdapterView<?> adapterView;
-
-	public PhiroSetVariableBrick() {
-		addAllowedBrickField(BrickField.VARIABLE);
-	}
+public class PhiroSetVariableBrick extends SetVariableBrick {
 
 	public PhiroSetVariableBrick(Formula variableFormula, UserVariable userVariable) {
 		this.userVariable = userVariable;
 		initializeBrickFields(variableFormula);
 	}
 
-	public PhiroSetVariableBrick(double value) {
-		this.userVariable = null;
-		initializeBrickFields(new Formula(value));
-	}
-
 	private void initializeBrickFields(Formula variableFormula) {
 		addAllowedBrickField(BrickField.VARIABLE);
 		setFormulaWithBrickField(BrickField.VARIABLE, variableFormula);
-	}
-
-	@Override
-	public int getRequiredResources() { return getFormulaWithBrickField(BrickField.VARIABLE).getRequiredResources();	}
-
-	@Override
-	public List<SequenceAction> addActionToSequence(Sprite sprite, SequenceAction sequence) {
-		sequence.addAction(ExtendedActions.setVariable(sprite, getFormulaWithBrickField(BrickField.VARIABLE),
-				userVariable));
-		return null;
-	}
-
-	@Override
-	public View getView(final Context context, int brickId, BaseAdapter baseAdapter) {
-		if (animationState) {
-			return view;
-		}
-		if (view == null) {
-			alphaValue = 255;
-		}
-
-		view = View.inflate(context, R.layout.brick_set_variable, null);
-		view = getViewWithAlpha(alphaValue);
-		setCheckboxView(R.id.brick_set_variable_checkbox);
-
-		final Brick brickInstance = this;
-		checkbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				checked = isChecked;
-				adapter.handleCheck(brickInstance, isChecked);
-			}
-		});
-
-		TextView prototypeText = (TextView) view.findViewById(R.id.brick_set_variable_prototype_view);
-		TextView textField = (TextView) view.findViewById(R.id.brick_set_variable_edit_text);
-		prototypeText.setVisibility(View.GONE);
-		getFormulaWithBrickField(BrickField.VARIABLE).setTextFieldId(R.id.brick_set_variable_edit_text);
-		getFormulaWithBrickField(BrickField.VARIABLE).refreshTextField(view);
-		textField.setVisibility(View.VISIBLE);
-		textField.setOnClickListener(this);
-
-		Spinner variableSpinner = (Spinner) view.findViewById(R.id.set_variable_spinner);
-
-		UserBrick currentBrick = ProjectManager.getInstance().getCurrentUserBrick();
-		int userBrickId = (currentBrick == null ? -1 : currentBrick.getUserBrickId());
-
-		DataAdapter dataAdapter = ProjectManager.getInstance().getCurrentProject().getDataContainer()
-				.createDataAdapter(context, userBrickId, ProjectManager.getInstance().getCurrentSprite(), inUserBrick);
-		UserVariableAdapterWrapper userVariableAdapterWrapper = new UserVariableAdapterWrapper(context,
-				dataAdapter);
-		userVariableAdapterWrapper.setItemLayout(android.R.layout.simple_spinner_item, android.R.id.text1);
-
-		variableSpinner.setAdapter(userVariableAdapterWrapper);
-
-		if (!(checkbox.getVisibility() == View.VISIBLE)) {
-			variableSpinner.setClickable(true);
-			variableSpinner.setEnabled(true);
-		} else {
-			variableSpinner.setClickable(false);
-			variableSpinner.setFocusable(false);
-		}
-
-		setSpinnerSelection(variableSpinner, null);
-
-		variableSpinner.setOnTouchListener(new OnTouchListener() {
-
-			@Override
-			public boolean onTouch(View view, MotionEvent event) {
-				if (event.getAction() == MotionEvent.ACTION_UP
-						&& (((Spinner) view).getSelectedItemPosition() == 0
-						&& ((Spinner) view).getAdapter().getCount() == 1)) {
-					NewDataDialog dialog = new NewDataDialog((Spinner) view, NewDataDialog.DialogType.USER_VARIABLE);
-					dialog.addVariableDialogListener(PhiroSetVariableBrick.this);
-					dialog.show(((SherlockFragmentActivity) view.getContext()).getSupportFragmentManager(),
-							NewDataDialog.DIALOG_FRAGMENT_TAG);
-					return true;
-				}
-
-				return false;
-			}
-		});
-		variableSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				if (position == 0 && ((UserVariableAdapterWrapper) parent.getAdapter()).isTouchInDropDownView()) {
-					NewDataDialog dialog = new NewDataDialog((Spinner) parent, NewDataDialog.DialogType.USER_VARIABLE);
-					dialog.addVariableDialogListener(PhiroSetVariableBrick.this);
-					dialog.show(((SherlockFragmentActivity) view.getContext()).getSupportFragmentManager(),
-							NewDataDialog.DIALOG_FRAGMENT_TAG);
-				}
-				((UserVariableAdapterWrapper) parent.getAdapter()).resetIsTouchInDropDownView();
-				userVariable = (UserVariable) parent.getItemAtPosition(position);
-				adapterView = parent;
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> arg0) {
-				userVariable = null;
-			}
-		});
-
-		return view;
 	}
 
 	@Override
@@ -224,46 +109,6 @@ public class PhiroSetVariableBrick extends UserVariableBrick {
 		}
 
 		return prototypeView;
-	}
-
-	@Override
-	public View getViewWithAlpha(int alphaValue) {
-
-		if (view != null) {
-
-			TextView textSetVariable = (TextView) view.findViewById(R.id.brick_set_variable_label);
-			TextView textTo = (TextView) view.findViewById(R.id.brick_set_variable_to_textview);
-			TextView editVariable = (TextView) view.findViewById(R.id.brick_set_variable_edit_text);
-			Spinner variablebrickSpinner = (Spinner) view.findViewById(R.id.set_variable_spinner);
-
-			ColorStateList color = textSetVariable.getTextColors().withAlpha(alphaValue);
-			variablebrickSpinner.getBackground().setAlpha(alphaValue);
-			if (adapterView != null) {
-				((TextView) adapterView.getChildAt(0)).setTextColor(color);
-			}
-			textSetVariable.setTextColor(textSetVariable.getTextColors().withAlpha(alphaValue));
-			textTo.setTextColor(textTo.getTextColors().withAlpha(alphaValue));
-			editVariable.setTextColor(editVariable.getTextColors().withAlpha(alphaValue));
-			editVariable.getBackground().setAlpha(alphaValue);
-
-			this.alphaValue = (alphaValue);
-
-		}
-
-		return view;
-	}
-
-	@Override
-	public Brick clone() {
-		PhiroSetVariableBrick clonedBrick = new PhiroSetVariableBrick(getFormulaWithBrickField(BrickField.VARIABLE)
-				.clone(), userVariable);
-		return clonedBrick;
-	}
-
-
-	@Override
-	public void showFormulaEditorToEditFormula(View view) {
-		FormulaEditorFragment.showFragment(view, this, BrickField.VARIABLE);
 	}
 
 }

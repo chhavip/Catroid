@@ -69,10 +69,7 @@ public class PhiroSetVariableTest extends BaseActivityInstrumentationTestCase<Ma
 		UiTestUtils.getIntoScriptActivityFromMainMenu(solo);
 	}
 
-	public void testCreateNewUserVariableAndDeletion() {
-		String userVariableName = "testVariable1";
-		String secondUserVariableName = "testVariable2";
-
+	public void testIfBrickWasSetUpCorrectly() {
 		ListView dragDropListView = UiTestUtils.getScriptListView(solo);
 		BrickAdapter adapter = (BrickAdapter) dragDropListView.getAdapter();
 
@@ -87,106 +84,6 @@ public class PhiroSetVariableTest extends BaseActivityInstrumentationTestCase<Ma
 
 		assertEquals("Wrong Brick instance.", projectBrickList.get(0), adapter.getChild(groupCount - 1, 0));
 		assertNotNull("TextView does not exist.", solo.getText(solo.getString(R.string.brick_set_variable)));
-
-		solo.clickOnText(getInstrumentation().getTargetContext().getString(
-				R.string.brick_variable_spinner_create_new_variable));
-		assertTrue("NewVariableDialog not visible", solo.waitForFragmentByTag(NewDataDialog.DIALOG_FRAGMENT_TAG));
-
-		EditText editText = (EditText) solo.getView(R.id.dialog_formula_editor_data_name_edit_text);
-		solo.enterText(editText, userVariableName);
-		solo.clickOnButton(solo.getString(R.string.ok));
-
-		//hack
-		solo.clickOnText(userVariableName);
-
-		assertTrue("ScriptFragment not visible", solo.waitForText(solo.getString(R.string.brick_set_variable)));
-		assertTrue("Created ProjectVariable not set on first position in spinner", solo.searchText(userVariableName));
-
-		UserVariable userVariable = (UserVariable) Reflection.getPrivateField(UserVariableBrick.class, setVariableBrick, "userVariable");
-		assertNotNull("UserVariable is null", userVariable);
-
-		solo.clickOnText(userVariableName);
-		solo.clickOnView(solo.getView(R.id.set_variable_spinner));
-
-//		solo.waitForText(getInstrumentation().getTargetContext().getString(
-//				R.string.brick_variable_spinner_create_new_variable));
-
-		solo.clickOnText(getInstrumentation().getTargetContext().getString(
-				R.string.brick_variable_spinner_create_new_variable));
-		assertTrue("NewVariableDialog not visible", solo.waitForFragmentByTag(NewDataDialog.DIALOG_FRAGMENT_TAG));
-
-		editText = (EditText) solo.getView(R.id.dialog_formula_editor_data_name_edit_text);
-		solo.enterText(editText, secondUserVariableName);
-		solo.clickOnView(solo.getView(R.id.dialog_formula_editor_data_name_local_variable_radio_button));
-		solo.clickOnButton(solo.getString(R.string.ok));
-		assertTrue("ScriptFragment not visible", solo.waitForText(solo.getString(R.string.brick_set_variable)));
-		assertTrue("Created SrpiteVariable not set on first position in spinner",
-				solo.searchText(secondUserVariableName));
-
-		userVariable = (UserVariable) Reflection.getPrivateField(UserVariableBrick.class, setVariableBrick, "userVariable");
-		assertNotNull("UserVariable is null", userVariable);
-		assertTrue("UserVariable Name not as expected", userVariable.getName().equals(secondUserVariableName));
-
-		solo.clickOnView(solo.getView(R.id.brick_set_variable_edit_text));
-		solo.waitForFragmentByTag(FormulaEditorFragment.FORMULA_EDITOR_FRAGMENT_TAG);
-		solo.clickOnView(solo.getView(R.id.formula_editor_keyboard_data));
-		assertTrue("Data Fragment not shown", solo.waitForFragmentByTag(FormulaEditorDataFragment.USER_DATA_TAG));
-
-		solo.clickLongOnText(secondUserVariableName);
-		assertTrue("Delete not shown", solo.waitForText(solo.getString(R.string.delete)));
-		solo.clickOnText(solo.getString(R.string.delete));
-		assertTrue("Data Fragment not shown", solo.waitForFragmentByTag(FormulaEditorDataFragment.USER_DATA_TAG));
-
-		solo.goBack();
-		solo.waitForFragmentByTag(FormulaEditorFragment.FORMULA_EDITOR_FRAGMENT_TAG);
-		assertTrue("Variable not set in spinner after deletion", solo.searchText(userVariableName));
-		Spinner userVariableSpinner = (Spinner) UiTestUtils.getViewContainerByIds(solo, R.id.set_variable_spinner,
-				R.id.formula_editor_brick_space);
-		assertEquals("UserVariable count not as expected in spinner", 2, userVariableSpinner.getAdapter().getCount());
-
-		solo.goBack();
-		assertTrue("ScriptFragment not visible", solo.waitForFragmentByTag(ScriptFragment.TAG));
-		assertTrue("Variable not set in spinner after deletion", solo.searchText(userVariableName));
-		userVariableSpinner = (Spinner) solo.getView(R.id.set_variable_spinner);
-		assertEquals("UserVariable count not as expected in spinner", 2, userVariableSpinner.getAdapter().getCount());
-		userVariable = (UserVariable) Reflection.getPrivateField(UserVariableBrick.class, setVariableBrick, "userVariable");
-		assertNotNull("UserVariable is null", userVariable);
-		assertTrue("UserVariable Name not as expected", userVariable.getName().equals(userVariableName));
-	}
-
-	public void testCreateUserVariableInFormulaEditor() {
-		String userVariableName = "testVariable1";
-
-		solo.clickOnView(solo.getView(R.id.brick_set_variable_edit_text));
-		solo.waitForFragmentByTag(FormulaEditorFragment.FORMULA_EDITOR_FRAGMENT_TAG);
-		solo.clickOnView(solo.getView(R.id.formula_editor_keyboard_data));
-		assertTrue("Data Fragment not shown", solo.waitForFragmentByTag(FormulaEditorDataFragment.USER_DATA_TAG));
-
-		solo.clickOnView(solo.getView(R.id.button_add));
-		assertTrue("Add Data Dialog not shown",
-				solo.waitForText(solo.getString(R.string.formula_editor_data_dialog_title)));
-		EditText editText = (EditText) solo.getView(R.id.dialog_formula_editor_data_name_edit_text);
-
-		solo.enterText(editText, userVariableName);
-		finishUserVariableCreationSafeButSlow(userVariableName, true);
-
-		solo.goBack();
-		solo.waitForFragmentByTag(FormulaEditorFragment.FORMULA_EDITOR_FRAGMENT_TAG);
-		assertTrue("Variable not set in spinner after creation", solo.searchText(userVariableName));
-
-		Spinner userVariableSpinner = (Spinner) UiTestUtils.getViewContainerByIds(solo, R.id.set_variable_spinner,
-				R.id.formula_editor_brick_space);
-		assertEquals("UserVariable count not as expected in spinner", 2, userVariableSpinner.getAdapter().getCount());
-		assertTrue("Variable not set in spinner after creation", userVariableSpinner.getSelectedItem() != null);
-
-		solo.goBack();
-		assertTrue("ScriptFragment not visible", solo.waitForFragmentByTag(ScriptFragment.TAG));
-		assertTrue("Variable not set in spinner after deletion", solo.searchText(userVariableName));
-		userVariableSpinner = (Spinner) solo.getView(R.id.set_variable_spinner);
-		assertEquals("UserVariable count not as expected in spinner", 2, userVariableSpinner.getAdapter().getCount());
-		UserVariable userVariable = (UserVariable) Reflection.getPrivateField(UserVariableBrick.class, setVariableBrick, "userVariable");
-		assertNotNull("UserVariable is null", userVariable);
-		assertTrue("UserVariable Name not as expected", userVariable.getName().equals(userVariableName));
 	}
 
 	private void createProject() {
