@@ -22,10 +22,7 @@
  */
 package org.catrobat.catroid.uitest.content.brick;
 
-import android.util.Log;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Spinner;
 
 import org.catrobat.catroid.ProjectManager;
 import org.catrobat.catroid.R;
@@ -35,18 +32,11 @@ import org.catrobat.catroid.content.Sprite;
 import org.catrobat.catroid.content.StartScript;
 import org.catrobat.catroid.content.bricks.Brick;
 import org.catrobat.catroid.content.bricks.PhiroSetVariableBrick;
-import org.catrobat.catroid.content.bricks.UserVariableBrick;
 import org.catrobat.catroid.formulaeditor.Formula;
 import org.catrobat.catroid.formulaeditor.FormulaElement;
 import org.catrobat.catroid.formulaeditor.Sensors;
-import org.catrobat.catroid.formulaeditor.UserVariable;
-import org.catrobat.catroid.test.utils.Reflection;
 import org.catrobat.catroid.ui.MainMenuActivity;
 import org.catrobat.catroid.ui.adapter.BrickAdapter;
-import org.catrobat.catroid.ui.dialogs.NewDataDialog;
-import org.catrobat.catroid.ui.fragment.FormulaEditorDataFragment;
-import org.catrobat.catroid.ui.fragment.FormulaEditorFragment;
-import org.catrobat.catroid.ui.fragment.ScriptFragment;
 import org.catrobat.catroid.uitest.util.BaseActivityInstrumentationTestCase;
 import org.catrobat.catroid.uitest.util.UiTestUtils;
 
@@ -54,7 +44,6 @@ import java.util.ArrayList;
 
 public class PhiroSetVariableTest extends BaseActivityInstrumentationTestCase<MainMenuActivity> {
 
-	private static final int MAX_ITERATIONS = 10;
 	private Project project;
 	private PhiroSetVariableBrick setVariableBrick;
 
@@ -100,41 +89,4 @@ public class PhiroSetVariableTest extends BaseActivityInstrumentationTestCase<Ma
 		ProjectManager.getInstance().setCurrentSprite(sprite);
 		ProjectManager.getInstance().setCurrentScript(script);
 	}
-
-	private void finishUserVariableCreationSafeButSlow(String itemString, boolean forAllSprites) {
-		int iteration = 0;
-
-		solo.clickOnButton(solo.getString(R.string.ok));
-		solo.waitForText(solo.getString(R.string.formula_editor_data), 0, 1000);
-
-		while (!solo.searchText(solo.getString(R.string.formula_editor_data), true)) {
-
-			if (iteration++ < MAX_ITERATIONS && iteration > 1) {
-				solo.goBack();
-				assertTrue("Data Fragment not shown",
-						solo.waitForText(solo.getString(R.string.formula_editor_variables), 0, 4000));
-				solo.clickOnView(solo.getView(R.id.button_add));
-				assertTrue("Add Data Dialog not shown",
-						solo.waitForText(solo.getString(R.string.formula_editor_variable_dialog_title)));
-
-				EditText editText = (EditText) solo.getView(R.id.dialog_formula_editor_data_name_edit_text);
-				solo.enterText(editText, itemString);
-
-				if (forAllSprites) {
-					assertTrue("Variable Dialog not shown",
-							solo.waitForText(solo.getString(R.string.formula_editor_dialog_for_all_sprites)));
-					solo.clickOnText(solo.getString(R.string.formula_editor_dialog_for_all_sprites));
-				} else {
-					assertTrue("Variable Dialog not shown", solo.waitForText(solo
-							.getString(R.string.formula_editor_dialog_for_this_sprite_only)));
-					solo.clickOnText(solo.getString(R.string.formula_editor_dialog_for_this_sprite_only));
-				}
-			}
-			Log.i("info", "(" + iteration + ")OkButton-found: " + solo.searchButton(solo.getString(R.string.ok)));
-
-			solo.clickOnButton(solo.getString(R.string.ok));
-			solo.waitForText(solo.getString(R.string.formula_editor_data), 0, 1000);
-		}
-	}
-
 }
